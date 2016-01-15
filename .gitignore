@@ -1,2 +1,4 @@
 /_ReSharper.Caches/
 *.suo
+/data/
+*.user
