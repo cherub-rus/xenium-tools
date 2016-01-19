@@ -9,7 +9,7 @@ namespace Org.XeniumTools.vCardGenerator {
     
     public static class Builder {
 
-        private const string HEADER = "BEGIN:VCARD\nVERSION:2.1";
+        private const string HEADER = "BEGIN:VCARD\r\nVERSION:2.1";
         private const string FOOTER = "END:VCARD";
 
         private const string FULL_NAME_FORMAT = "N:{0};;;;";
