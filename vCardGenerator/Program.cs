@@ -57,7 +57,8 @@ namespace Org.XeniumTools.vCardGenerator {
             }
             contacts.Sort();
 
-            File.WriteAllText(target, Builder.BuildFileContent(contacts).ToString(), Encoding.Default);
+            UTF8Encoding UTF8NoBOM = new UTF8Encoding(false, true);
+            File.WriteAllText(target, Builder.BuildFileContent(contacts).ToString(), UTF8NoBOM);
         }
 
         private static void PrintErrors(CsvContact contact) {
