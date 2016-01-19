@@ -15,6 +15,7 @@ namespace Org.XeniumTools.vCardGenerator {
             try {
                 if (args.Length != 2) {
                     Console.WriteLine("Usage: vCardGenerator.exe sourceFile targetFile");
+                    return;
                 }
                 String source = args[0];
                 String target = args[1];
