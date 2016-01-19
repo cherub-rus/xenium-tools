@@ -1,4 +1,4 @@
-﻿namespace Org.XeniumTools.CsvFixer {
+﻿namespace Org.XeniumTools.Common {
 
     public class PhoneNumber {
 

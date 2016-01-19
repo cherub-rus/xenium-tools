@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
+using Org.XeniumTools.Common;
+
 namespace Org.XeniumTools.CsvFixer {
     
     public static class Builder {

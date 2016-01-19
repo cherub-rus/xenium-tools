@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Org.XeniumTools.CsvFixer {
+namespace Org.XeniumTools.Common {
 
     public class CsvContact : IComparable<CsvContact> {
 

@@ -5,6 +5,10 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsvFixer", "CsvFixer\CsvFixer.csproj", "{B8BA1396-BBC1-406B-9700-608E1741584C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vCardGenerator", "vCardGenerator\vCardGenerator.csproj", "{BA9509AC-5DF7-4675-A67F-F4F261E54E2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{2AC835CC-0DB4-498E-AAA9-50B25577FA31}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{B8BA1396-BBC1-406B-9700-608E1741584C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8BA1396-BBC1-406B-9700-608E1741584C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8BA1396-BBC1-406B-9700-608E1741584C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA9509AC-5DF7-4675-A67F-F4F261E54E2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA9509AC-5DF7-4675-A67F-F4F261E54E2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA9509AC-5DF7-4675-A67F-F4F261E54E2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA9509AC-5DF7-4675-A67F-F4F261E54E2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AC835CC-0DB4-498E-AAA9-50B25577FA31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AC835CC-0DB4-498E-AAA9-50B25577FA31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AC835CC-0DB4-498E-AAA9-50B25577FA31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AC835CC-0DB4-498E-AAA9-50B25577FA31}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

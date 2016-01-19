@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
+using Org.XeniumTools.Common;
+
 namespace Org.XeniumTools.CsvFixer {
 
     [SuppressMessage("ReSharper", "LocalizableElement")]
@@ -12,7 +14,7 @@ namespace Org.XeniumTools.CsvFixer {
         static void Main(string[] args) {
             try {
                 if (args.Length != 2) {
-                    Console.WriteLine("Usage: Xenium_csvFixer.exe sourceFile targetFile");
+                    Console.WriteLine("Usage: CsvFixer.exe sourceFile targetFile");
                 }
                 String source = args[0];
                 String target = args[1];
