@@ -12,10 +12,10 @@ namespace Org.XeniumTools.Common {
 
         private readonly string name;
 
-        private readonly PhoneNumber number = new PhoneNumber(TYPE_NUMBER);
-        private readonly PhoneNumber number2 = new PhoneNumber(TYPE_NUMBER2);
-        private readonly PhoneNumber home = new PhoneNumber(TYPE_HOME);
-        private readonly PhoneNumber office = new PhoneNumber(TYPE_OFFICE);
+        private readonly CsvPhoneNumber number = new CsvPhoneNumber(TYPE_NUMBER);
+        private readonly CsvPhoneNumber number2 = new CsvPhoneNumber(TYPE_NUMBER2);
+        private readonly CsvPhoneNumber home = new CsvPhoneNumber(TYPE_HOME);
+        private readonly CsvPhoneNumber office = new CsvPhoneNumber(TYPE_OFFICE);
 
         private readonly List<string> errors = new List<string>();
 
@@ -27,19 +27,19 @@ namespace Org.XeniumTools.Common {
             get { return name; }
         }
 
-        public PhoneNumber Number {
+        public CsvPhoneNumber Number {
             get { return number; }
         }
 
-        public PhoneNumber Number2 {
+        public CsvPhoneNumber Number2 {
             get { return number2; }
         }
 
-        public PhoneNumber Home {
+        public CsvPhoneNumber Home {
             get { return home; }
         }
 
-        public PhoneNumber Office {
+        public CsvPhoneNumber Office {
             get { return office; }
         }
 
@@ -51,7 +51,7 @@ namespace Org.XeniumTools.Common {
             return String.Compare(name, other.name, StringComparison.CurrentCulture);
         }
 
-        public PhoneNumber GetPhoneNumber(string type) {
+        public CsvPhoneNumber GetPhoneNumber(string type) {
             switch (type) {
                 case TYPE_NUMBER:
                     return number;

@@ -23,7 +23,7 @@ namespace Org.XeniumTools.CsvFixer {
             return fileContent;
         }
 
-        private static void AppendNumber(StringBuilder fileContent, PhoneNumber number) {
+        private static void AppendNumber(StringBuilder fileContent, CsvPhoneNumber number) {
             if (number.Number != null) {
                 fileContent.Append(string.Format("\"{0}\",\"{1}\",", number.Type, number.Number));
             }

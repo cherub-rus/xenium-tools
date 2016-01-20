@@ -64,7 +64,7 @@ namespace Org.XeniumTools.vCardGenerator {
             return false;
         }
 
-        private static void AppendNumber(StringBuilder fileContent, PhoneNumber number, string format) {
+        private static void AppendNumber(StringBuilder fileContent, CsvPhoneNumber number, string format) {
             if (!string.IsNullOrEmpty(number.Number)) {
                 fileContent.AppendLine(string.Format(format, number.Number));
             }

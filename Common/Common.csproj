@@ -35,8 +35,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CsvContact.cs" />
-    <Compile Include="Parser.cs" />
-    <Compile Include="PhoneNumber.cs" />
+    <Compile Include="CsvParser.cs" />
+    <Compile Include="CsvPhoneNumber.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

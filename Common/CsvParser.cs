@@ -2,7 +2,7 @@
 
 namespace Org.XeniumTools.Common {
 
-    public static class Parser {
+    public static class CsvParser {
 
         public static List<CsvContact> Parse(string[] lines) {
             List<CsvContact> contacts = new List<CsvContact>();
@@ -20,7 +20,7 @@ namespace Org.XeniumTools.Common {
         }
 
         private static void SetNumber(CsvContact contact, string number, string type) {
-            PhoneNumber field = contact.GetPhoneNumber(type);
+            CsvPhoneNumber field = contact.GetPhoneNumber(type);
             if (field == null) {
                 contact.Errors.Add(
                     string.Format(

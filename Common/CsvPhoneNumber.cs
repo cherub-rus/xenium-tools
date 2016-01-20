@@ -1,10 +1,10 @@
 ﻿namespace Org.XeniumTools.Common {
 
-    public class PhoneNumber {
+    public class CsvPhoneNumber {
 
         private readonly string type;
 
-        public PhoneNumber(string type) {
+        public CsvPhoneNumber(string type) {
             this.type = type;
         }
 

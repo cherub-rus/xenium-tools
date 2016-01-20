@@ -51,7 +51,7 @@ namespace Org.XeniumTools.CsvFixer {
             string[] lines = File.ReadAllLines(source, Encoding.Default);
 
             List<CsvContact> contacts = new List<CsvContact>();
-            foreach (CsvContact contact in Parser.Parse(lines)) {
+            foreach (CsvContact contact in CsvParser.Parse(lines)) {
                 contacts.Add(FixContact(contact));
                 PrintErrors(contact);
             }
