@@ -15,10 +15,10 @@ namespace Org.XeniumTools.vCardGenerator {
         private const string FULL_NAME_FORMAT = "N:{0};;;;";
         private const string NAME_FORMAT = "N:{0};{1};;;";
 
-        private const string OFFICE_FORMAT = "TEL;WORK:{0}";
-        private const string HOME_FORMAT = "TEL;HOME:{0}";
-        private const string NUMBER2_FORMAT = "TEL;WORK;FAX:{0}";
         private const string NUMBER_FORMAT = "TEL;CELL:{0}";
+        private const string NUMBER2_FORMAT = "TEL;WORK;FAX:{0}";
+        private const string HOME_FORMAT = "TEL;HOME:{0}";
+        private const string OFFICE_FORMAT = "TEL;WORK:{0}";
         
         public static StringBuilder BuildFileContent(IList<CsvContact> contacts) {
 
@@ -26,10 +26,10 @@ namespace Org.XeniumTools.vCardGenerator {
             foreach (CsvContact contact in contacts) {
                 fileContent.AppendLine(HEADER);
                 fileContent.AppendLine(PrepareName(contact));
-                AppendNumber(fileContent, contact.Office, OFFICE_FORMAT);
-                AppendNumber(fileContent, contact.Home, HOME_FORMAT);
-                AppendNumber(fileContent, contact.Number2, NUMBER2_FORMAT);
                 AppendNumber(fileContent, contact.Number, NUMBER_FORMAT);
+                AppendNumber(fileContent, contact.Number2, NUMBER2_FORMAT);
+                AppendNumber(fileContent, contact.Home, HOME_FORMAT);
+                AppendNumber(fileContent, contact.Office, OFFICE_FORMAT);
                 fileContent.AppendLine(FOOTER);
             }
             return fileContent;
