@@ -2,3 +2,5 @@
 *.suo
 /data/
 *.user
+/.vs/
+/packages/
