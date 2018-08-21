@@ -46,7 +46,7 @@
     <Compile Include="ModemHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SmsRaw.cs" />
+    <Compile Include="CellData.cs" />
     <Compile Include="SmsProcessor.cs" />
     <Compile Include="SmsRawData.cs" />
     <Compile Include="Ucs2Tools.cs" />

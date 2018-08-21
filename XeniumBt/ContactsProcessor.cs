@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -22,7 +21,7 @@ namespace XeniumBt {
 
         public void GetContacts() {
             StringBuilder vcards = new StringBuilder();
-            IList<string> cardsData;
+            IList<CellData> cardsData;
             string rawContactsFileName = config.RawContactsFile;
             if(rawContactsFileName == null || !File.Exists(rawContactsFileName)) {
                 cardsData = LoadCardsFromPhone();
@@ -30,15 +29,14 @@ namespace XeniumBt {
                     FileTools.Serialize(rawContactsFileName, cardsData);
                 }
             } else {
-                IList<string> tempData = (List<string>)FileTools.Deserialize(rawContactsFileName, typeof(List<string>));
-                cardsData = new List<string>();
-                foreach(string str in tempData) {
-                    cardsData.Add(str.Replace("\n", "\r\n").Replace("\r\r\n", "\r\n"));
+                cardsData = (List<CellData>)FileTools.Deserialize(rawContactsFileName, typeof(List<CellData>));
+                foreach(CellData data in cardsData) {
+                    data.text = data.text.Replace("\n", "\r\n").Replace("\r\r\n", "\r\n");
                 }
             }
 
-            foreach(string data in cardsData) {
-                string card = CleanUpVCard(CommandParser.ParseEFSR(data.Replace("\r\n", "")));
+            foreach(CellData data in cardsData) {
+                string card = CleanUpVCard(CommandParser.ParseEFSR(data.text.Replace("\r\n", "")));
                 vcards.AppendLine(card);
             }
 
@@ -47,18 +45,37 @@ namespace XeniumBt {
             File.WriteAllText(vcfFile, vcards.ToString(), Encoding.UTF8);
         }
 
-        private IList<string> LoadCardsFromPhone() {
+        private IList<CellData> LoadCardsFromPhone() {
             try {
-                IList<string> cardsData = new List<string>();
-
                 modemHelper.Connect();
+
                 modemHelper.DoCommand("AT+CSCS=\"UCS2\"");
                 modemHelper.DoCommand("AT+CPBS=\"ME\"");
-                int count = CommandParser.ParseCPBS(modemHelper.DoCommandWithResult("AT+CPBS?").Replace("\r\n", ""));
+                string CPBSResult = modemHelper.DoCommandWithResult("AT+CPBS?").Replace("\r\n", "");
 
-                for (int i = 1; i <= count; i++) {
-                    cardsData.Add(GetVCard(i));
+                Tuple<int, int> stat;
+                try {
+                    stat = CommandParser.ParseCPBS(CPBSResult);
+                } catch(Exception) {
+                    WriteLog("CPBSResult :" + CPBSResult);
+                    throw;
                 }
+
+                int count = 0;
+                IList<CellData> cardsData = new List<CellData>();
+                for(int i = 1; i <= stat.Item2; i++) {
+                    if(count < stat.Item1) {
+                        string result = GetVCard(i);
+                        if(result.Replace("\r\n", "").Equals("ERROR")) {
+                            continue;
+                        }
+                        cardsData.Add(new CellData(i, result));
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
+
                 return cardsData;
             } finally {
                 if (modemHelper != null) {
@@ -141,6 +158,10 @@ namespace XeniumBt {
             }
 
             return false;
+        }
+
+        private void WriteLog(string message) {
+            FileTools.WriteLog(config.LogFile, message);
         }
     }
 }

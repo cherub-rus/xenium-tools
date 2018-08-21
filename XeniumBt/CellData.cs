@@ -3,7 +3,7 @@
 namespace XeniumBt {
 
     [Serializable]
-    public class SmsRaw {
+    public class CellData {
 
         // ReSharper disable once FieldCanBeMadeReadOnly.Global
         public int cell;
@@ -11,9 +11,9 @@ namespace XeniumBt {
         public string text;
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public SmsRaw() { }
+        public CellData() { }
 
-        public SmsRaw(int cell, string text) {
+        public CellData(int cell, string text) {
             this.cell = cell;
             this.text = text;
         }

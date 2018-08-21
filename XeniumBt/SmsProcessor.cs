@@ -16,7 +16,7 @@ namespace XeniumBt {
         }
 
         public void GetMessages() {
-            List<SmsRaw> rawSms;
+            IList<CellData> rawSms;
 
             string rawSmsFileName = config.RawSmsFile;
             if (rawSmsFileName == null || !File.Exists(rawSmsFileName)) {
@@ -25,14 +25,14 @@ namespace XeniumBt {
                     FileTools.Serialize(rawSmsFileName, rawSms);
                 }
             } else {
-                rawSms = (List<SmsRaw>)FileTools.Deserialize(rawSmsFileName, typeof(List<SmsRaw>));
-                foreach (SmsRaw sms in rawSms) {
+                rawSms = (List<CellData>)FileTools.Deserialize(rawSmsFileName, typeof(List<CellData>));
+                foreach (CellData sms in rawSms) {
                     sms.text = sms.text.Replace("\n", "\r\n").Replace("\r\r\n", "\r\n");
                 }
             }
 
             IList<SmsRawData> smsList = new List<SmsRawData>();
-            foreach (SmsRaw msgData in rawSms) {
+            foreach (CellData msgData in rawSms) {
                 string msg = msgData.text;
 
                 if (msg.StartsWith("\r\n+CMGR: \"REC READ\"") ||
@@ -63,7 +63,7 @@ namespace XeniumBt {
             File.WriteAllText(smsFile, smsOut.ToString(), Encoding.UTF8);
         }
 
-        private List<SmsRaw> LoadMessagesFromPhone() {
+        private IList<CellData> LoadMessagesFromPhone() {
             try {
                 modemHelper.Connect();
 
@@ -77,21 +77,20 @@ namespace XeniumBt {
                 Tuple<int, int> stat;
                 try {
                     stat = CommandParser.ParseCPMS(CPMSResult);
-                } catch (Exception e) {
-                    Console.WriteLine("CPMSResult :" + CPMSResult);
-                    Console.WriteLine(e);
+                } catch (Exception) {
+                    WriteLog("CPMSResult :" + CPMSResult);
                     throw;
                 }
 
                 int count = 0;
-                List<SmsRaw> rawSms = new List<SmsRaw>();
+                List<CellData> rawSms = new List<CellData>();
                 for (int i = 1; i <= stat.Item2; i++) {
                     if (count < stat.Item1) {
                         string result = modemHelper.DoCommandWithResult("AT+CMGR=" + i);
                         if (result.Replace("\r\n", "").Equals("ERROR")) {
                             continue;
                         }
-                        rawSms.Add(new SmsRaw(i, result));
+                        rawSms.Add(new CellData(i, result));
                         count++;
                     } else {
                         break;

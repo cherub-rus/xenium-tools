@@ -8,7 +8,7 @@ namespace XeniumBt {
 
     public static class CommandParser {
 
-        public static int ParseCPBS(string data) {
+        public static Tuple<int, int> ParseCPBS(string data) {
 
             const string pattern =
                 @"^\+CPBS: ""(?<store>.+)"", (?<count>\d+), (?<total>\d+)$"
@@ -17,8 +17,9 @@ namespace XeniumBt {
             IDictionary<string, string> result = ParseByRegex(data, pattern);
 
             string count = result["count"];
+            string total = result["total"];
 
-            return Int32.Parse(count);
+            return new Tuple<int, int>(Int32.Parse(count), Int32.Parse(total));
         }
 
 
