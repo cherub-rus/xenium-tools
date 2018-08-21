@@ -10,7 +10,7 @@ namespace Org.XeniumTools.vCardGenerator {
 
     [SuppressMessage("ReSharper", "LocalizableElement")]
     public static class Program {
-        
+
         static void Main(string[] args) {
             try {
                 if (args.Length != 2) {
@@ -43,7 +43,7 @@ namespace Org.XeniumTools.vCardGenerator {
             }
 
 #if DEBUG
-		    Console.ReadLine();
+            Console.ReadLine();
 #endif
         }
 
