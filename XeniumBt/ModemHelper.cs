@@ -29,15 +29,11 @@ namespace XeniumBt {
             serial.Write(command + "\r\n");
             // Todo receive data wo sleep
             Thread.Sleep(config.Timeout);
-            
+
             string reply = serial.ReadExisting();
             WriteLog(reply);
-            string s = Convert.ToString(reply).Replace(command + "\r\n", "").Replace("OK\r\n", "");
-            if (s.Contains("ERROR")) {
-                throw new Exception("ERROR received");
-            }
 
-            return s;
+            return Convert.ToString(reply).Replace(command + "\r\n", "").Replace("OK\r\n", "");
         }
 
         public void Connect() {

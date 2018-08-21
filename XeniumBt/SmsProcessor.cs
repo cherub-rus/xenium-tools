@@ -87,13 +87,12 @@ namespace XeniumBt {
                 List<SmsRaw> rawSms = new List<SmsRaw>();
                 for (int i = 1; i <= stat.Item2; i++) {
                     if (count < stat.Item1) {
-                        try {
-                            rawSms.Add(new SmsRaw(i, modemHelper.DoCommandWithResult("AT+CMGR=" + i)));
-                            count++;
-                        } catch (Exception e) {
-                            //TODO  Console.WriteLine(e);
-                            //log Error reading message from cell #x. Skipping.
+                        string result = modemHelper.DoCommandWithResult("AT+CMGR=" + i);
+                        if (result.Replace("\r\n", "").Equals("ERROR")) {
+                            continue;
                         }
+                        rawSms.Add(new SmsRaw(i, result));
+                        count++;
                     } else {
                         break;
                     }
