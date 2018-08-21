@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Xml.Serialization;
 
 namespace XeniumBt {
 
@@ -19,13 +18,14 @@ namespace XeniumBt {
         public void GetMessages() {
             List<SmsRaw> rawSms;
 
-            if (config.RawSmsFile == null || !File.Exists(config.RawSmsFile)) {
+            string rawSmsFileName = config.RawSmsFile;
+            if (rawSmsFileName == null || !File.Exists(rawSmsFileName)) {
                 rawSms = LoadMessagesFromPhone();
-                if (config.RawSmsFile != null) {
-                    Serialize(config.RawSmsFile, rawSms);
+                if (rawSmsFileName != null) {
+                    FileTools.Serialize(rawSmsFileName, rawSms);
                 }
             } else {
-                rawSms = (List<SmsRaw>)Deserialize(config.RawSmsFile, typeof(List<SmsRaw>));
+                rawSms = (List<SmsRaw>)FileTools.Deserialize(rawSmsFileName, typeof(List<SmsRaw>));
                 foreach (SmsRaw sms in rawSms) {
                     sms.text = sms.text.Replace("\n", "\r\n").Replace("\r\r\n", "\r\n");
                 }
@@ -92,7 +92,7 @@ namespace XeniumBt {
                             count++;
                         } catch (Exception e) {
                             //TODO  Console.WriteLine(e);
-                            //log Error reading message from cell #x. Scipping.
+                            //log Error reading message from cell #x. Skipping.
                         }
                     } else {
                         break;
@@ -157,30 +157,5 @@ namespace XeniumBt {
         private void WriteLog(string message) {
             File.AppendAllLines(config.LogFile, new[] { message }, Encoding.UTF8);
         }
-
-        private void Serialize(string filename, object data) {
-            FileStream fileStream =
-                new FileStream(filename, FileMode.Create, FileAccess.Write);
-            StreamWriter sw = new StreamWriter(fileStream, Encoding.UTF8);
-            XmlSerializer s = new XmlSerializer(data.GetType());
-            s.Serialize(sw, data);
-            sw.Close();
-            fileStream.Close();
-        }
-
-        private object Deserialize(string filename, Type type) {
-            FileStream fileStream =
-                new FileStream(filename, FileMode.Open, FileAccess.Read);
-            StreamReader sr = new StreamReader(fileStream, Encoding.UTF8);
-            try {
-                XmlSerializer s = new XmlSerializer(type);
-                return s.Deserialize(sr);
-            } finally {
-                sr.Close();
-                fileStream.Close();
-            }
-        }
-
     }
-
 }

@@ -31,7 +31,7 @@ namespace XeniumBt {
         private Program() {
             config = new Config();
             ModemHelper modemHelper = new ModemHelper(config);
-            contactsProcessor = new ContactsProcessor(modemHelper);
+            contactsProcessor = new ContactsProcessor(config, modemHelper);
             smsProcessor = new SmsProcessor(config, modemHelper);
         }
 

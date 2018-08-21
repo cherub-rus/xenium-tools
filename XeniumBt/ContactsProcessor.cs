@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,33 +13,58 @@ namespace XeniumBt {
         private const string NAME_FORMAT = "N:{0};{1};;;";
 
         private readonly ModemHelper modemHelper;
+        private readonly Config config;
 
-        public ContactsProcessor(ModemHelper modemHelper) {
+        public ContactsProcessor(Config config, ModemHelper modemHelper) {
+            this.config = config;
             this.modemHelper = modemHelper;
         }
 
         public void GetContacts() {
             StringBuilder vcards = new StringBuilder();
+            IList<string> cardsData;
+            string rawContactsFileName = config.RawContactsFile;
+            if(rawContactsFileName == null || !File.Exists(rawContactsFileName)) {
+                cardsData = LoadCardsFromPhone();
+                if(rawContactsFileName != null) {
+                    FileTools.Serialize(rawContactsFileName, cardsData);
+                }
+            } else {
+                IList<string> tempData = (List<string>)FileTools.Deserialize(rawContactsFileName, typeof(List<string>));
+                cardsData = new List<string>();
+                foreach(string str in tempData) {
+                    cardsData.Add(str.Replace("\n", "\r\n").Replace("\r\r\n", "\r\n"));
+                }
+            }
 
+            foreach(string data in cardsData) {
+                string card = CleanUpVCard(CommandParser.ParseEFSR(data.Replace("\r\n", "")));
+                vcards.AppendLine(card);
+            }
+
+            string fileName = ".\\contacts_" + DateTime.Today.ToString("yyyyMMdd") + ".vcf";
+            string vcfFile = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+            File.WriteAllText(vcfFile, vcards.ToString(), Encoding.UTF8);
+        }
+
+        private IList<string> LoadCardsFromPhone() {
             try {
+                IList<string> cardsData = new List<string>();
+
                 modemHelper.Connect();
                 modemHelper.DoCommand("AT+CSCS=\"UCS2\"");
                 modemHelper.DoCommand("AT+CPBS=\"ME\"");
                 int count = CommandParser.ParseCPBS(modemHelper.DoCommandWithResult("AT+CPBS?").Replace("\r\n", ""));
 
                 for (int i = 1; i <= count; i++) {
-                    string card = GetVCard(i);
-//                vcards.AppendLine("#"+i);
-                    vcards.AppendLine(card);
+                    cardsData.Add(GetVCard(i));
                 }
+                return cardsData;
             } finally {
                 if (modemHelper != null) {
                     modemHelper.Disconnect();
                 }
             }
-            string vcfFile = Path.Combine(Directory.GetCurrentDirectory(),".\\contacts.vcf");
-            File.WriteAllText(vcfFile, vcards.ToString(), Encoding.UTF8);
-//            WriteLog(vcards);
         }
 
         private string GetVCard(int index) {
@@ -50,11 +77,9 @@ namespace XeniumBt {
 
             string data = modemHelper.DoCommandWithResult($"AT+EFSR=\"{fileNameEncoded}\"");
 
-            string result = CleanUpVCard(CommandParser.ParseEFSR(data.Replace("\r\n", "")));
-
             modemHelper.DoCommand($"AT+EFSD=\"{fileNameEncoded}\"");
             modemHelper.DoCommand("AT+ESUO=4");
-            return result;
+            return data;
         }
 
         private static string CleanUpVCard(string message) {
