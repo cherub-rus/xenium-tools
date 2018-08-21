@@ -8,25 +8,24 @@ namespace XeniumBt {
 
     internal class SmsProcessor {
 
-        private const string RAW_SMS_TEMP_FILE = "rawSms.txt";
-        private readonly string phonefilter;
         private readonly ModemHelper modemHelper;
-        private readonly string logFile;
+        private readonly Config config;
 
-        public SmsProcessor(string phonefilter, ModemHelper modemHelper, string logFile) {
-            this.phonefilter = phonefilter;
+        public SmsProcessor(Config config, ModemHelper modemHelper) {
+            this.config = config;
             this.modemHelper = modemHelper;
-            this.logFile = logFile;
         }
 
         public void GetMessages() {
             List<SmsRaw> rawSms;
 
-            if (!File.Exists(RAW_SMS_TEMP_FILE)) {
+            if (config.RawSmsFile == null || !File.Exists(config.RawSmsFile)) {
                 rawSms = LoadMessagesFromPhone();
-                Serialize(RAW_SMS_TEMP_FILE, rawSms);
+                if (config.RawSmsFile != null) {
+                    Serialize(config.RawSmsFile, rawSms);
+                }
             } else {
-                rawSms = (List<SmsRaw>)Deserialize(RAW_SMS_TEMP_FILE, typeof(List<SmsRaw>));
+                rawSms = (List<SmsRaw>)Deserialize(config.RawSmsFile, typeof(List<SmsRaw>));
                 foreach (SmsRaw sms in rawSms) {
                     sms.text = sms.text.Replace("\n", "\r\n").Replace("\r\r\n", "\r\n");
                 }
@@ -50,7 +49,7 @@ namespace XeniumBt {
             IList<SmsRawData> combined = CombineSms(smsList);
             foreach (SmsRawData data in combined) {
                 smsDebug.AppendLine(data.ToString()).AppendLine();
-                if (phonefilter == null || phonefilter == data.phonenumber) {
+                if (config.PhoneFilter == null || config.PhoneFilter == data.phonenumber) {
 //                    smsOut.AppendLine(data.ToMobilePhoneToolsSms()).AppendLine();
                     smsOut.AppendLine(data.ToMtkPhoneSuiteSms());
                 }
@@ -156,7 +155,7 @@ namespace XeniumBt {
         }
 
         private void WriteLog(string message) {
-            File.AppendAllLines(logFile, new[] { message }, Encoding.UTF8);
+            File.AppendAllLines(config.LogFile, new[] { message }, Encoding.UTF8);
         }
 
         private void Serialize(string filename, object data) {

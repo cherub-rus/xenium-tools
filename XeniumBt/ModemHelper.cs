@@ -10,11 +10,9 @@ namespace XeniumBt {
 
         private SerialPort serial;
         private readonly Config config;
-        private readonly string logFile;
 
-        public ModemHelper(Config config, string logFile) {
+        public ModemHelper(Config config) {
             this.config = config;
-            this.logFile = logFile;
         }
 
         public void DoCommand(string command) {
@@ -67,7 +65,7 @@ namespace XeniumBt {
         }
 
         private void WriteLog(string message) {
-            File.AppendAllLines(logFile, new []{ message }, Encoding.UTF8);
+            File.AppendAllLines(config.LogFile, new []{ message }, Encoding.UTF8);
         }
     }
 }
