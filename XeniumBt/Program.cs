@@ -22,7 +22,7 @@ namespace XeniumBt {
                 Console.WriteLine("done");
             }
             catch (Exception e) {
-                WriteLog(e);
+                Console.WriteLine(e);
                 Console.WriteLine("error");
             }
             Console.ReadKey();
@@ -60,10 +60,6 @@ namespace XeniumBt {
             if (config.LoadSms) {
                 smsProcessor.GetMessages();
             }
-        }
-
-        private static void WriteLog(Exception exp) {
-            Console.WriteLine(exp);
         }
     }
 }

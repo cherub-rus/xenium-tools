@@ -30,5 +30,9 @@ namespace XeniumBt {
             }
         }
 
+        public static void WriteLog(string fileName, string message) {
+            File.AppendAllLines(fileName, new []{ message }, Encoding.UTF8);
+        }
+
     }
 }

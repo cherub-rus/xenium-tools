@@ -65,7 +65,7 @@ namespace XeniumBt {
         }
 
         private void WriteLog(string message) {
-            File.AppendAllLines(config.LogFile, new []{ message }, Encoding.UTF8);
+            FileTools.WriteLog(config.LogFile, message);
         }
     }
 }
