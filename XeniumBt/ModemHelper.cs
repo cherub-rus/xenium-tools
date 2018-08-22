@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.IO.Ports;
-using System.Text;
 using System.Threading;
 
 namespace XeniumBt {
@@ -24,14 +22,14 @@ namespace XeniumBt {
         }
 
         private string ExecAndReceive(string command) {
-            WriteLog("Calling : " + command);
+            WriteLog("[CALL]:" + command);
 
             serial.Write(command + "\r\n");
             // Todo receive data wo sleep
             Thread.Sleep(config.Timeout);
 
             string reply = serial.ReadExisting();
-            WriteLog(reply);
+            WriteLog("[RESPONSE]:" + reply);
 
             return Convert.ToString(reply).Replace(command + "\r\n", "").Replace("OK\r\n", "");
         }
@@ -42,14 +40,7 @@ namespace XeniumBt {
                 BaudRate = config.BaudRate,
             };
 
-            serial.DataReceived += OnReceived;
-
             serial.Open();
-        }
-
-        private void OnReceived(object sender, SerialDataReceivedEventArgs e) {
-            // Todo receive data wo sleep
-            string a = e.ToString();
         }
 
         public void Disconnect() {

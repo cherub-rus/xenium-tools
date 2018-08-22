@@ -87,7 +87,7 @@ namespace XeniumBt {
                 for (int i = 1; i <= stat.Item2; i++) {
                     if (count < stat.Item1) {
                         string result = modemHelper.DoCommandWithResult("AT+CMGR=" + i);
-                        if (result.Replace("\r\n", "").Equals("ERROR")) {
+                        if (result.Replace("\r\n", "").Equals(CommandParser.ERROR_CODE)) {
                             continue;
                         }
                         rawSms.Add(new CellData(i, result));
@@ -115,8 +115,8 @@ namespace XeniumBt {
                     } else {
                         // debug
                         WriteLog("MessageKey duplicate\r\n" +
-                                 " adding = " + data + "\r\n" +
-                                 " existed =" + result[data.MessageKey]);
+                                 $" adding  = {data}\r\n" +
+                                 $" existed = {result[data.MessageKey]}");
                     }
                     continue;
                 }
@@ -128,8 +128,8 @@ namespace XeniumBt {
                 if (sl[data.PartGroupKey].ContainsKey(data.partlyNum)) {
                     // debug
                     WriteLog("partlyNum duplicate:\r\n" +
-                             " adding  =" + data + "\r\n" + 
-                             " existed =" + sl[data.PartGroupKey][data.partlyNum]);
+                             $" adding  = {data}\r\n" +
+                             $" existed = {sl[data.PartGroupKey][data.partlyNum]}");
                     continue;
                 }
                 sl[data.PartGroupKey].Add(data.partlyNum, data);
@@ -138,7 +138,7 @@ namespace XeniumBt {
             foreach (string key in sl.Keys) {
                 SortedList<int, SmsRawData> parts = sl[key];
                 if (parts.Count < 2){
-                    WriteLog("Invalid parts. data=" + parts.Values[0]);
+                    WriteLog("Invalid parts. data = " + parts.Values[0]);
                     continue;
                 }
                 SmsRawData data = parts[1];

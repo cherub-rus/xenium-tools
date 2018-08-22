@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace XeniumBt {
 
     public static class CommandParser {
 
+        public const string ERROR_CODE = "ERROR";
+
         public static Tuple<int, int> ParseCPBS(string data) {
 
             const string pattern =
-                @"^\+CPBS: ""(?<store>.+)"", (?<count>\d+), (?<total>\d+)$"
-                ;
+                @"^\+CPBS: ""(?<store>.+)"", (?<count>\d+), (?<total>\d+)$";
 
             IDictionary<string, string> result = ParseByRegex(data, pattern);
 
@@ -22,6 +21,13 @@ namespace XeniumBt {
             return new Tuple<int, int>(Int32.Parse(count), Int32.Parse(total));
         }
 
+        public static string ParseEVCARD(string data) {
+            const string pattern =
+                    @"^\+EVCARD: ""(?<name>.*)""$";
+
+            IDictionary<string, string> result = ParseByRegex(data, pattern);
+            return result["name"];
+        }
 
         public static string ParseEFSR(string data) {
 
@@ -43,8 +49,7 @@ namespace XeniumBt {
         public static Tuple<int, int> ParseCPMS(string data) {
 
             const string pattern =
-                    @"^\+CPMS: (?<count>\d+), (?<total>\d+), \d+, \d+, \d+, \d+$"
-                ;
+                    @"^\+CPMS: (?<count>\d+), (?<total>\d+), \d+, \d+, \d+, \d+$";
 
             IDictionary<string, string> result = ParseByRegex(data, pattern);
 
@@ -56,8 +61,7 @@ namespace XeniumBt {
 
         public static SmsRawData ParseCMGR(string str, int cellNumber) {
             const string pattern =
-                    @"^\+CMGR: ""(?<info>.+)"",""(?<number>.+)"",,""(?<date>.+)"",\d+,(?<fo>\d+),\d+,\d+,""\d+"",\d+,\d+$"
-                ;
+                    @"^\+CMGR: ""(?<info>.+)"",""(?<number>.+)"",,""(?<date>.+)"",\d+,(?<fo>\d+),\d+,\d+,""\d+"",\d+,\d+$";
 
             string[] lines = str.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 

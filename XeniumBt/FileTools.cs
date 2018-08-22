@@ -31,7 +31,7 @@ namespace XeniumBt {
         }
 
         public static void WriteLog(string fileName, string message) {
-            File.AppendAllLines(fileName, new []{ message }, Encoding.UTF8);
+            File.AppendAllLines(fileName, new []{ $"[{DateTime.Now:dd.MM.yyyy HH:mm:ss.fff}] {message}" }, Encoding.UTF8);
         }
 
     }

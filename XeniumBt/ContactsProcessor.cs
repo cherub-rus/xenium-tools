@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -20,7 +21,6 @@ namespace XeniumBt {
         }
 
         public void GetContacts() {
-            StringBuilder vcards = new StringBuilder();
             IList<CellData> cardsData;
             string rawContactsFileName = config.RawContactsFile;
             if(rawContactsFileName == null || !File.Exists(rawContactsFileName)) {
@@ -35,14 +35,16 @@ namespace XeniumBt {
                 }
             }
 
+            SortedList<string,string> sl = new SortedList<string, string>();
             foreach(CellData data in cardsData) {
                 string card = CleanUpVCard(CommandParser.ParseEFSR(data.text.Replace("\r\n", "")));
-                vcards.AppendLine(card);
+                string name = card.Split('\n').Single(s => s.StartsWith("N:")).Replace(';',' ');
+                sl.Add(name, card);
             }
 
             string fileName = ".\\contacts_" + DateTime.Today.ToString("yyyyMMdd") + ".vcf";
             string vcfFile = Path.Combine(Directory.GetCurrentDirectory(), fileName);
-            File.WriteAllText(vcfFile, vcards.ToString(), Encoding.UTF8);
+            File.WriteAllLines(vcfFile, sl.Values, Encoding.UTF8);
         }
 
         private IList<CellData> LoadCardsFromPhone() {
@@ -66,7 +68,7 @@ namespace XeniumBt {
                 for(int i = 1; i <= stat.Item2; i++) {
                     if(count < stat.Item1) {
                         string result = GetVCard(i);
-                        if(result.Replace("\r\n", "").Equals("ERROR")) {
+                        if(result.Replace("\r\n", "").Equals(CommandParser.ERROR_CODE)) {
                             continue;
                         }
                         cardsData.Add(new CellData(i, result));
@@ -85,12 +87,12 @@ namespace XeniumBt {
         }
 
         private string GetVCard(int index) {
-            modemHelper.DoCommand("AT+EVCARD=1," + index);
+            string fileNameEncoded = CommandParser.ParseEVCARD(modemHelper.DoCommandWithResult("AT+EVCARD=1," + index).Replace("\r\n", ""));
+            if (fileNameEncoded.Length == 0) {
+                return CommandParser.ERROR_CODE;
+            }
+
             modemHelper.DoCommand("AT+ESUO=3");
-
-            const string vcardFileName = "C:\\Received\\~vcard_r.vcf";
-
-            string fileNameEncoded = Ucs2Tools.UnicodeStringToHexString(vcardFileName);
 
             string data = modemHelper.DoCommandWithResult($"AT+EFSR=\"{fileNameEncoded}\"");
 
