@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
 using System.Text;
 
 namespace XeniumBt {
      
-    public class Ucs2Tools {
+    public static class Ucs2Tools {
 
         public static String UnicodeStringToHexString(String strMessage) {
             byte[] bytes = Encoding.BigEndianUnicode.GetBytes(strMessage);
