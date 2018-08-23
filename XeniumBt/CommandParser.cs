@@ -8,6 +8,7 @@ namespace XeniumBt {
 
         public const string ERROR_CODE = "ERROR";
 
+        // ReSharper disable once InconsistentNaming
         public static Tuple<int, int> ParseCPBS(string data) {
 
             const string pattern =
@@ -21,6 +22,7 @@ namespace XeniumBt {
             return new Tuple<int, int>(Int32.Parse(count), Int32.Parse(total));
         }
 
+        // ReSharper disable once InconsistentNaming
         public static string ParseEVCARD(string data) {
             const string pattern =
                     @"^\+EVCARD: ""(?<name>.*)""$";
@@ -29,6 +31,7 @@ namespace XeniumBt {
             return result["name"];
         }
 
+        // ReSharper disable once InconsistentNaming
         public static string ParseEFSR(string data) {
 
             string[] parts = data.Split( new [] { "+EFSR" }, StringSplitOptions.RemoveEmptyEntries);
@@ -46,6 +49,7 @@ namespace XeniumBt {
             return vcard;
         }
 
+        // ReSharper disable once InconsistentNaming
         public static Tuple<int, int> ParseCPMS(string data) {
 
             const string pattern =
@@ -59,6 +63,7 @@ namespace XeniumBt {
             return new Tuple<int, int>(Int32.Parse(count), Int32.Parse(total));
         }
 
+        // ReSharper disable once InconsistentNaming
         public static SmsRawData ParseCMGR(string str, int cellNumber) {
             const string pattern =
                     @"^\+CMGR: ""(?<info>.+)"",""(?<number>.+)"",,""(?<date>.+)"",\d+,(?<fo>\d+),\d+,\d+,""\d+"",\d+,\d+$";
@@ -66,27 +71,31 @@ namespace XeniumBt {
             string[] lines = str.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
             IDictionary<string, string> result = ParseByRegex(lines[0], pattern);
+            bool isPart = (byte.Parse(result["fo"]) & 64) != 0;
 
-            SmsRawData data = new SmsRawData();
+            SmsRawData data = isPart ? (SmsRawData)new SmsPart() : new SmsMessage();
+
             data.type = result["info"];
             data.status = result["info"];
-            data.phonenumber = result["number"];
-            string dateWithTz = result["date"].Replace("+12", "+3:00").Replace("+28","+7:00");
+            data.phoneNumber = result["number"];
+            string dateWithTz = result["date"].Replace("+12", "+3:00").Replace("+28", "+7:00");
             data.date = DateTime.Parse(dateWithTz);
             data.fo = byte.Parse(result["fo"]);
+            data.cells = "#" + cellNumber;
 
-            string userdata = lines[1];
-            if ((data.fo & 64) != 0) {
-                int headerLength = (Ucs2Tools.HexStringToHexBytes(userdata.Substring(0, 2))[0] + 1)*2;
-                data.userdataheader = userdata.Substring(0, headerLength);
-                byte[] header = Ucs2Tools.HexStringToHexBytes(data.userdataheader);
-                data.partlyCount = header[4];
-                data.partlyNum = header[5];
-                data.partlyId = header[3];
-                userdata = userdata.Remove(0, headerLength);
+            string userData = lines[1];
+            if (data is SmsMessage) {
+                data.text = Ucs2Tools.HexStringToUnicodeString(userData);
+            } else if (data is SmsPart part) {
+                int headerLength = (Ucs2Tools.HexStringToHexBytes(userData.Substring(0, 2))[0] + 1)*2;
+                part.userdataheader = userData.Substring(0, headerLength);
+                byte[] header = Ucs2Tools.HexStringToHexBytes(part.userdataheader);
+                part.id = header[3];
+                part.totalParts = header[4];
+                part.partlyNum = header[5];
+                userData = userData.Remove(0, headerLength);
+                part.text = Ucs2Tools.HexStringToUnicodeString(userData);
             }
-            data.cells.Add(cellNumber.ToString()); 
-            data.text[data.partlyNum] = Ucs2Tools.HexStringToUnicodeString(userdata);
             return data;
         }
 

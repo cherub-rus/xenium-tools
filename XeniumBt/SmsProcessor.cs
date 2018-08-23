@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace XeniumBt {
@@ -44,12 +45,13 @@ namespace XeniumBt {
 
             StringBuilder smsDebug = new StringBuilder();
             StringBuilder smsOut = new StringBuilder();
+            smsOut.AppendLine("#sorted");
             smsOut.AppendLine("Phone Number\tTime\tMessage");
 
-            IList<SmsRawData> combined = CombineSms(smsList);
-            foreach (SmsRawData data in combined) {
+            IList<SmsMessage> combined = CombineSms(smsList);
+            foreach (SmsMessage data in combined) {
                 smsDebug.AppendLine(data.ToString()).AppendLine();
-                if (config.PhoneFilter == null || config.PhoneFilter == data.phonenumber) {
+                if (config.PhoneFilter == null || config.PhoneFilter == data.phoneNumber) {
 //                    smsOut.AppendLine(data.ToMobilePhoneToolsSms()).AppendLine();
                     smsOut.AppendLine(data.ToMtkPhoneSuiteSms());
                 }
@@ -104,52 +106,51 @@ namespace XeniumBt {
             }
         }
 
-        private IList<SmsRawData> CombineSms(IList<SmsRawData> raw) {
-            SortedList<string, SmsRawData> result = new SortedList<string, SmsRawData>();
-            SortedList<string, SortedList<int, SmsRawData>> sl = new SortedList<string, SortedList<int, SmsRawData>>();
+        private IList<SmsMessage> CombineSms(IList<SmsRawData> raw) {
+            SortedList<string, SmsMessage> result = new SortedList<string, SmsMessage>();
+            SortedList<string, List<SmsPart>> sl = new SortedList<string, List<SmsPart>>();
 
-            foreach (SmsRawData data in raw) {
-                if (!data.IsPartly) {
-                    if (!result.ContainsKey(data.MessageKey)) {
-                        result.Add(data.MessageKey, data);
-                    } else {
-                        // debug
-                        WriteLog("MessageKey duplicate\r\n" +
-                                 $" adding  = {data}\r\n" +
-                                 $" existed = {result[data.MessageKey]}");
+            foreach(SmsRawData data in raw) {
+                if(data is SmsPart multi) {
+                    string key = multi.PartsGroupKey;
+                    if(!sl.ContainsKey(key)) {
+                        sl.Add(key, new List<SmsPart>());
                     }
-                    continue;
+                    sl[key].Add(multi);
+                } else {
+                    result.Add(data.MessageKey, (SmsMessage)data);
                 }
-
-                if (!sl.ContainsKey(data.PartGroupKey)) {
-                    sl.Add(data.PartGroupKey, new SortedList<int, SmsRawData>());
-                }
-
-                if (sl[data.PartGroupKey].ContainsKey(data.partlyNum)) {
-                    // debug
-                    WriteLog("partlyNum duplicate:\r\n" +
-                             $" adding  = {data}\r\n" +
-                             $" existed = {sl[data.PartGroupKey][data.partlyNum]}");
-                    continue;
-                }
-                sl[data.PartGroupKey].Add(data.partlyNum, data);
             }
 
-            foreach (string key in sl.Keys) {
-                SortedList<int, SmsRawData> parts = sl[key];
-                if (parts.Count < 2){
-                    WriteLog("Invalid parts. data = " + parts.Values[0]);
-                    continue;
+            foreach(string key in sl.Keys) {
+                List<SmsPart> list = sl[key];
+
+                if (list.Count == list[0].totalParts) {
+                    SmsMessage data = JoinSmsData(list);
+                    result.Add(data.MessageKey, data);
+                } else {
+                    if(list.Count < 2) {
+                        WriteLog("Invalid parts. key = " + key);
+                    }
+
+                    foreach(SmsPart part in list) {
+                        result.Add(part.MessageKey, new SmsMessage(part, true));
+                    }
                 }
-                SmsRawData data = parts[1];
-                for (int i = 2; i < parts.Count + 1; i++) {
-                    data.text[i] = parts[i].text[i];
-                    data.cells.AddRange(parts[i].cells);
-                }
-                result.Add(data.MessageKey, data);
             }
 
             return result.Values;
+        }
+
+        private static SmsMessage JoinSmsData(IList<SmsPart> list) {
+            IList<SmsPart> parts = list.OrderBy(i => i.partlyNum).ToList();
+            SmsMessage data = new SmsMessage(parts[0]);
+            foreach (SmsPart part in parts) {
+                data.text += part.text;
+                data.cells += part.cells;
+                data.debug += " " + part.PartInfo;
+            }
+            return data;
         }
 
         private void WriteLog(string message) {
