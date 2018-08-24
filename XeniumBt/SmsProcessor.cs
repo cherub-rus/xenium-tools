@@ -110,47 +110,68 @@ namespace XeniumBt {
             SortedList<string, SmsMessage> result = new SortedList<string, SmsMessage>();
             SortedList<string, List<SmsPart>> sl = new SortedList<string, List<SmsPart>>();
 
-            foreach(SmsRawData data in raw) {
-                if(data is SmsPart multi) {
+            foreach (SmsRawData data in raw) {
+                if (data is SmsPart multi) {
                     string key = multi.PartsGroupKey;
-                    if(!sl.ContainsKey(key)) {
+                    if (!sl.ContainsKey(key)) {
                         sl.Add(key, new List<SmsPart>());
                     }
+
                     sl[key].Add(multi);
                 } else {
                     result.Add(data.MessageKey, (SmsMessage)data);
                 }
             }
 
-            foreach(string key in sl.Keys) {
+            foreach (string key in sl.Keys) {
                 List<SmsPart> list = sl[key];
+                SmsPart first = list.First();
+                int totalParts = first.totalParts;
 
-                if (list.Count == list[0].totalParts) {
-                    SmsMessage data = JoinSmsData(list);
-                    result.Add(data.MessageKey, data);
-                } else {
-                    if(list.Count < 2) {
-                        WriteLog("Invalid parts. key = " + key);
-                    }
+                if (list.Count < 2) {
+                    WriteLog("Invalid parts. key = " + key);
+                    result.Add(first.MessageKey, new SmsMessage(first, true));
+                    continue;
+                }
 
-                    foreach(SmsPart part in list) {
-                        result.Add(part.MessageKey, new SmsMessage(part, true));
+                IList<SmsPart> ordered = list.OrderBy(i => i.PartInMessageKey).ToList();
+                IList<SmsMessage> combined = new List<SmsMessage>();
+
+                for (int i = 1; i <= totalParts; i++) {
+                    foreach (SmsPart part in ordered.Where(p => p.number == i)) {
+                        List<SmsMessage> notFilled = combined.Where(c => !c.HasPart(i)).ToList();
+                        SmsMessage message = FindNearestMessage(notFilled, part);
+                        if (message != null) {
+                            message.AddPart(part);
+                        } else {
+                            combined.Add(new SmsMessage(part, true));
+                        }
                     }
+                }
+
+                foreach (SmsMessage part in combined) {
+                    result.Add(part.MessageKey, part);
                 }
             }
 
             return result.Values;
         }
 
-        private static SmsMessage JoinSmsData(IList<SmsPart> list) {
-            IList<SmsPart> parts = list.OrderBy(i => i.number).ToList();
-            SmsMessage data = new SmsMessage(parts[0]);
-            foreach (SmsPart part in parts) {
-                data.text += part.text;
-                data.cells += part.cells;
-                data.debug += " " + part.PartInfo;
+        private SmsMessage FindNearestMessage(IList<SmsMessage> messages, SmsPart part) {
+            foreach (SmsMessage message in messages) {
+                if (message.date == part.date) {
+                    return message;
+                }
             }
-            return data;
+
+            TimeSpan dateSpread = new TimeSpan(0, 0, 30);
+            foreach (SmsMessage message in messages) {
+                if (part.date.Subtract(message.date).Duration() <= dateSpread) {
+                    return message;
+                }
+            }
+
+            return null;
         }
 
         private void WriteLog(string message) {

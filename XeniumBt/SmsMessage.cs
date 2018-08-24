@@ -1,10 +1,12 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 
 namespace XeniumBt {
 
     public class SmsMessage : SmsRawData {
 
-        public string debug;
+        private string debug;
+        private readonly IList<int> hasParts = new List<int>();
 
         public SmsMessage() { }
 
@@ -15,10 +17,19 @@ namespace XeniumBt {
             fo = part.fo;
             date = part.date;
             if (copyAll) {
-                cells = part.cells;
-                text = part.text;
-                debug = " " + part.PartInfo;
+                AddPart(part);
             }
+        }
+
+        public void AddPart(SmsPart part) {
+            hasParts.Add(part.number);
+            cells += part.cells;
+            text += part.text;
+            debug += " " + part.PartInfo;
+        }
+
+        public bool HasPart(int num) {
+            return hasParts.Contains(num);
         }
 
         public override string MessageKey => 

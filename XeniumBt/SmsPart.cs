@@ -16,7 +16,10 @@ namespace XeniumBt {
 
         public string PartsGroupKey => 
             //TODO remove
-            $"{phoneNumber}@{id:0000}{totalParts:0000}" + $"{date:yyyyMMddHHmm}";
+            $"{phoneNumber}@{id:0000}{totalParts:0000}";
+
+        public string PartInMessageKey => 
+            $"{number:0000}{date:yyyyMMddHHmmss}{cells}";
 
         public override string DebugInfo() {
             return base.DebugInfo() + $" {PartInfo}\r\nText : {text}";
