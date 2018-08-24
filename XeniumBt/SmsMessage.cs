@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace XeniumBt {
 
@@ -22,31 +21,22 @@ namespace XeniumBt {
             }
         }
 
-        public override string MessageKey {
-            get { return phoneNumber + "@" +
-                         date.ToString("yyyyMMddHHmmss") + 
-                         cells;
-            }
-        }
+        public override string MessageKey => 
+            $"{phoneNumber}@{date:yyyyMMddHHmmss}{cells}";
 
         protected string ToMobilePhoneToolsSms() {
             return "Отправитель : " + phoneNumber + "\r\n" +
                    "Время : " + date.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n" +
-                   "Содержание : " + String.Join("", text)
-                ;
+                   "Содержание : " + text;
         }
 
         public string ToMtkPhoneSuiteSms() {
-            return "\"" + phoneNumber + "\"\t\"" +
-                   date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture) + "\"\t\"" +
-                   String.Join("", text) + "\""
-                ;
+            string dateString = date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+            return $"\"{phoneNumber}\"\t\"{dateString}\"\t\"{text}\"";
         }
 
         public override string DebugInfo() {
-            return base.DebugInfo() + 
-                   debug +
-                   "\r\nText : " + text;
+            return base.DebugInfo() + $"{debug}\r\nText : {text}";
         }
     }
 }

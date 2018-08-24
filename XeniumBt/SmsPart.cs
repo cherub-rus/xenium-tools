@@ -5,39 +5,21 @@ namespace XeniumBt {
 
         public int id;
         public int totalParts;
-        public int partlyNum;
+        public int number;
         public string userdataheader;
 
-        public string PartInfo {
-            get {
-                return $"Partly : {totalParts}:{partlyNum}:{id}, User Data Header : {userdataheader}";
-            }
-        }
+        public string PartInfo => 
+            $"Partly : {totalParts}:{number}:{id}, User Data Header : {userdataheader}";
 
-        public override string MessageKey {
-            get {
-                return phoneNumber + "@" +
-                       date.ToString("yyyyMMddHHmmss") +
-                       id.ToString("0000") +
-                       totalParts.ToString("0000") +
-                       cells;
-            }
-        }
+        public override string MessageKey => 
+            $"{phoneNumber}@{date:yyyyMMddHHmmss}{id:0000}{totalParts:0000}{cells}";
 
-         public string PartsGroupKey {
-            get {
-                return phoneNumber + "@" +
-                       id.ToString("0000") +
-                       totalParts.ToString("0000")
-                       //TODO remove
-                       + date.ToString("yyyyMMddHHmm")
-                    ;
-            }
-        }
-
+        public string PartsGroupKey => 
+            //TODO remove
+            $"{phoneNumber}@{id:0000}{totalParts:0000}" + $"{date:yyyyMMddHHmm}";
 
         public override string DebugInfo() {
-            return base.DebugInfo() + " " + PartInfo + "\r\nText : " + text;
+            return base.DebugInfo() + $" {PartInfo}\r\nText : {text}";
         }
     }
 }

@@ -78,10 +78,11 @@ namespace XeniumBt {
             data.type = result["info"];
             data.status = result["info"];
             data.phoneNumber = result["number"];
+            // TODO timezone parsing
             string dateWithTz = result["date"].Replace("+12", "+3:00").Replace("+28", "+7:00");
             data.date = DateTime.Parse(dateWithTz);
             data.fo = byte.Parse(result["fo"]);
-            data.cells = "#" + cellNumber;
+            data.cells = $"#{cellNumber:000}";
 
             string userData = lines[1];
             if (data is SmsMessage) {
@@ -89,12 +90,12 @@ namespace XeniumBt {
             } else if (data is SmsPart part) {
                 int headerLength = (Ucs2Tools.HexStringToHexBytes(userData.Substring(0, 2))[0] + 1)*2;
                 part.userdataheader = userData.Substring(0, headerLength);
+                // TODO header processing
                 byte[] header = Ucs2Tools.HexStringToHexBytes(part.userdataheader);
                 part.id = header[3];
                 part.totalParts = header[4];
-                part.partlyNum = header[5];
-                userData = userData.Remove(0, headerLength);
-                part.text = Ucs2Tools.HexStringToUnicodeString(userData);
+                part.number = header[5];
+                part.text = Ucs2Tools.HexStringToUnicodeString(userData.Substring(headerLength));
             }
             return data;
         }

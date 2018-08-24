@@ -143,7 +143,7 @@ namespace XeniumBt {
         }
 
         private static SmsMessage JoinSmsData(IList<SmsPart> list) {
-            IList<SmsPart> parts = list.OrderBy(i => i.partlyNum).ToList();
+            IList<SmsPart> parts = list.OrderBy(i => i.number).ToList();
             SmsMessage data = new SmsMessage(parts[0]);
             foreach (SmsPart part in parts) {
                 data.text += part.text;
