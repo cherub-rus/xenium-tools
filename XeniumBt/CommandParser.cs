@@ -78,9 +78,7 @@ namespace XeniumBt {
             data.type = result["info"];
             data.status = result["info"];
             data.phoneNumber = result["number"];
-            // TODO timezone parsing
-            string dateWithTz = result["date"].Replace("+12", "+3:00").Replace("+28", "+7:00");
-            data.date = DateTime.Parse(dateWithTz);
+            data.date = DateTime.Parse(FixTimeZoneOffset(result["date"]));
             data.fo = byte.Parse(result["fo"]);
             data.cells = $"#{cellNumber:000}";
 
@@ -98,6 +96,26 @@ namespace XeniumBt {
                 part.text = Ucs2Tools.HexStringToUnicodeString(userData.Substring(headerLength));
             }
             return data;
+        }
+
+        private static string FixTimeZoneOffset(string dateString) {
+            Tuple<string, string> dateFix = null;
+            char[] splitters = {'+', '-'};
+            foreach (char splitter in splitters) {
+                int tzIndex = dateString.LastIndexOf(splitter);
+                if (tzIndex >= dateString.Length - 3) {
+                    string qTz = dateString.Substring(tzIndex);
+                    int qOffset = Int32.Parse(qTz.Substring(1));
+                    string offset = new TimeSpan(0, qOffset * 15, 0).ToString(@"hh\:mm");
+                    dateFix = new Tuple<string, string>(qTz, splitter + offset);
+                    break;
+                }
+            }
+
+            return dateFix == null
+                ? dateString
+                : dateString.Replace(dateFix.Item1, dateFix.Item2);
+
         }
 
         private static IDictionary<string, string> ParseByRegex(String sdr, string pattern) {
