@@ -34,11 +34,9 @@ namespace XeniumBt {
 
             IList<SmsRawData> smsList = new List<SmsRawData>();
             foreach (CellData msgData in rawSms) {
-                string msg = msgData.text;
 
-                if (msg.StartsWith("\r\n+CMGR: \"REC READ\"") ||
-                    msg.StartsWith("\r\n+CMGR: \"REC UNREAD\"")) {
-                    SmsRawData data = CommandParser.ParseCMGR(msg, msgData.cell);
+                SmsRawData data = CommandParser.ParseCMGR(msgData.text, msgData.cell);
+                if (data.type == "REC") {
                     smsList.Add(data);
                 }
             }

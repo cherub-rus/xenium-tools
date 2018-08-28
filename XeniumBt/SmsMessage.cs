@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace XeniumBt {
@@ -42,7 +43,7 @@ namespace XeniumBt {
         }
 
         public string ToMtkPhoneSuiteSms() {
-            string dateString = date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture);
+            string dateString = date != DateTime.MinValue ? date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture) : "";
             return $"\"{phoneNumber}\"\t\"{dateString}\"\t\"{text}\"";
         }
 

@@ -66,7 +66,7 @@ namespace XeniumBt {
         // ReSharper disable once InconsistentNaming
         public static SmsRawData ParseCMGR(string str, int cellNumber) {
             const string pattern =
-                    @"^\+CMGR: ""(?<info>.+)"",""(?<number>.+)"",,""(?<date>.+)"",\d+,(?<fo>\d+),\d+,\d+,""\d+"",\d+,\d+$";
+                    @"^\+CMGR: ""(?<type>.+)\s(?<status>.+)"",""(?<number>.+)"",,(""(?<date>.*)""){0,1}\d{0,3},\d+,(?<fo>\d+),\d+,\d+,""\d*"",\d+,\s{0,1}\d+$";
 
             string[] lines = str.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -75,10 +75,11 @@ namespace XeniumBt {
 
             SmsRawData data = isPart ? (SmsRawData)new SmsPart() : new SmsMessage();
 
-            data.type = result["info"];
-            data.status = result["info"];
+            data.type = result["type"];
+            data.status = result["status"];
             data.phoneNumber = result["number"];
-            data.date = DateTime.Parse(FixTimeZoneOffset(result["date"]));
+            string dateString = result["date"];
+            data.date = dateString.Length == 0 ? DateTime.MinValue : DateTime.Parse(FixTimeZoneOffset(dateString));
             data.fo = byte.Parse(result["fo"]);
             data.cells = $"#{cellNumber:000}";
 
