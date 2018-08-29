@@ -4,24 +4,24 @@ namespace XeniumBt {
 
     public abstract class SmsRawData {
 
-        public string type;
-        public string status;
-        public string phoneNumber;
-        public byte fo;
-        public string cells;
-        public DateTime date;
-        public string text;
+        public string @Type { get; set; }
+        public string Status { get; set; }
+        public string PhoneNumber { get; set; }
+        public byte Fo { get; set; }
+        public string Cells { get; set; }
+        public DateTime Date { get; set; }
+        public string Text { get; set; }
 
         public abstract string MessageKey { get; }
 
-        public virtual string DebugInfo() {
+        protected virtual string DebugInfo() {
             return
-                "Cell : " + cells + ", " 
-                + "Type : " + type + ", "
-                + "Status : " + status + ", "
-                + "Phone Number : " + phoneNumber + ", "
-                + "First Octet : " + fo + ", "
-                + "Date : " + date.ToString("dd-MM-yyyy HH:mm:ss");
+                "Cell : " + Cells + ", " 
+                + "Type : " + Type + ", "
+                + "Status : " + Status + ", "
+                + "Phone Number : " + PhoneNumber + ", "
+                + "First Octet : " + Fo + ", "
+                + "Date : " + Date.ToString("dd-MM-yyyy HH:mm:ss");
         }
 
         public override string ToString() {

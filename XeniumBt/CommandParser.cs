@@ -75,26 +75,26 @@ namespace XeniumBt {
 
             SmsRawData data = isPart ? (SmsRawData)new SmsPart() : new SmsMessage();
 
-            data.type = result["type"];
-            data.status = result["status"];
-            data.phoneNumber = result["number"];
+            data.Type = result["type"];
+            data.Status = result["status"];
+            data.PhoneNumber = result["number"];
             string dateString = result["date"];
-            data.date = dateString.Length == 0 ? DateTime.MinValue : DateTime.Parse(FixTimeZoneOffset(dateString));
-            data.fo = byte.Parse(result["fo"]);
-            data.cells = $"#{cellNumber:000}";
+            data.Date = dateString.Length == 0 ? DateTime.MinValue : DateTime.Parse(FixTimeZoneOffset(dateString));
+            data.Fo = byte.Parse(result["fo"]);
+            data.Cells = $"#{cellNumber:000}";
 
             string userData = lines[1];
             if (data is SmsMessage) {
-                data.text = Ucs2Tools.HexStringToUnicodeString(userData);
+                data.Text = Ucs2Tools.HexStringToUnicodeString(userData);
             } else if (data is SmsPart part) {
                 int headerLength = (Ucs2Tools.HexStringToHexBytes(userData.Substring(0, 2))[0] + 1)*2;
-                part.userdataheader = userData.Substring(0, headerLength);
+                part.UserDataHeader = userData.Substring(0, headerLength);
                 // TODO header processing
-                byte[] header = Ucs2Tools.HexStringToHexBytes(part.userdataheader);
-                part.id = header[3];
-                part.totalParts = header[4];
-                part.number = header[5];
-                part.text = Ucs2Tools.HexStringToUnicodeString(userData.Substring(headerLength));
+                byte[] header = Ucs2Tools.HexStringToHexBytes(part.UserDataHeader);
+                part.Id = header[3];
+                part.TotalParts = header[4];
+                part.Number = header[5];
+                part.Text = Ucs2Tools.HexStringToUnicodeString(userData.Substring(headerLength));
             }
             return data;
         }

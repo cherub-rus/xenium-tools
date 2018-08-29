@@ -36,7 +36,7 @@ namespace XeniumBt {
             foreach (CellData msgData in rawSms) {
 
                 SmsRawData data = CommandParser.ParseCMGR(msgData.text, msgData.cell);
-                if (data.type == "REC") {
+                if (data.Type == "REC") {
                     smsList.Add(data);
                 }
             }
@@ -49,7 +49,7 @@ namespace XeniumBt {
             IList<SmsMessage> combined = CombineSms(smsList);
             foreach (SmsMessage data in combined) {
                 smsDebug.AppendLine(data.ToString()).AppendLine();
-                if (config.PhoneFilter == null || config.PhoneFilter == data.phoneNumber) {
+                if (config.PhoneFilter == null || config.PhoneFilter == data.PhoneNumber) {
 //                    smsOut.AppendLine(data.ToMobilePhoneToolsSms()).AppendLine();
                     smsOut.AppendLine(data.ToMtkPhoneSuiteSms());
                 }
@@ -124,7 +124,7 @@ namespace XeniumBt {
             foreach (string key in sl.Keys) {
                 List<SmsPart> list = sl[key];
                 SmsPart first = list.First();
-                int totalParts = first.totalParts;
+                int totalParts = first.TotalParts;
 
                 if (list.Count < 2) {
                     WriteLog("Invalid parts. key = " + key);
@@ -136,7 +136,7 @@ namespace XeniumBt {
                 IList<SmsMessage> combined = new List<SmsMessage>();
 
                 for (int i = 1; i <= totalParts; i++) {
-                    foreach (SmsPart part in ordered.Where(p => p.number == i)) {
+                    foreach (SmsPart part in ordered.Where(p => p.Number == i)) {
                         List<SmsMessage> notFilled = combined.Where(c => !c.HasPart(i)).ToList();
                         SmsMessage message = FindNearestMessage(notFilled, part);
                         if (message != null) {
@@ -157,14 +157,14 @@ namespace XeniumBt {
 
         private SmsMessage FindNearestMessage(IList<SmsMessage> messages, SmsPart part) {
             foreach (SmsMessage message in messages) {
-                if (message.date == part.date) {
+                if (message.Date == part.Date) {
                     return message;
                 }
             }
 
             TimeSpan dateSpread = new TimeSpan(0, 0, 30);
             foreach (SmsMessage message in messages) {
-                if (part.date.Subtract(message.date).Duration() <= dateSpread) {
+                if (part.Date.Subtract(message.Date).Duration() <= dateSpread) {
                     return message;
                 }
             }

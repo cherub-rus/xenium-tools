@@ -12,20 +12,20 @@ namespace XeniumBt {
         public SmsMessage() { }
 
         public SmsMessage(SmsPart part, bool copyAll = false) {
-            type = part.type;
-            status = part.status;
-            phoneNumber = part.phoneNumber;
-            fo = part.fo;
-            date = part.date;
+            Type = part.Type;
+            Status = part.Status;
+            PhoneNumber = part.PhoneNumber;
+            Fo = part.Fo;
+            Date = part.Date;
             if (copyAll) {
                 AddPart(part);
             }
         }
 
         public void AddPart(SmsPart part) {
-            hasParts.Add(part.number);
-            cells += part.cells;
-            text += part.text;
+            hasParts.Add(part.Number);
+            Cells += part.Cells;
+            Text += part.Text;
             debug += " " + part.PartInfo;
         }
 
@@ -34,21 +34,21 @@ namespace XeniumBt {
         }
 
         public override string MessageKey => 
-            $"{phoneNumber}@{date:yyyyMMddHHmmss}{cells}";
+            $"{PhoneNumber}@{Date:yyyyMMddHHmmss}{Cells}";
 
         protected string ToMobilePhoneToolsSms() {
-            return "Отправитель : " + phoneNumber + "\r\n" +
-                   "Время : " + date.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n" +
-                   "Содержание : " + text;
+            return "Отправитель : " + PhoneNumber + "\r\n" +
+                   "Время : " + Date.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n" +
+                   "Содержание : " + Text;
         }
 
         public string ToMtkPhoneSuiteSms() {
-            string dateString = date != DateTime.MinValue ? date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture) : "";
-            return $"\"{phoneNumber}\"\t\"{dateString}\"\t\"{text}\"";
+            string dateString = Date != DateTime.MinValue ? Date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture) : "";
+            return $"\"{PhoneNumber}\"\t\"{dateString}\"\t\"{Text}\"";
         }
 
-        public override string DebugInfo() {
-            return base.DebugInfo() + $"{debug}\r\nText : {text}";
+        protected override string DebugInfo() {
+            return base.DebugInfo() + $"{debug}\r\nText : {Text}";
         }
     }
 }

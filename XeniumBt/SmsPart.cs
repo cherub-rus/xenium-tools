@@ -3,26 +3,25 @@ namespace XeniumBt {
 
     public class SmsPart : SmsRawData {
 
-        public int id;
-        public int totalParts;
-        public int number;
-        public string userdataheader;
+        public int Id { private get; set; }
+        public int TotalParts { get; set; }
+        public int Number { get; set; }
+        public string UserDataHeader { get; set; }
 
         public string PartInfo => 
-            $"Partly : {totalParts}:{number}:{id}, User Data Header : {userdataheader}";
+            $"Partly : {TotalParts}:{Number}:{Id}, User Data Header : {UserDataHeader}";
 
         public override string MessageKey => 
-            $"{phoneNumber}@{date:yyyyMMddHHmmss}{id:0000}{totalParts:0000}{cells}";
+            $"{PhoneNumber}@{Date:yyyyMMddHHmmss}{Id:0000}{TotalParts:0000}{Cells}";
 
         public string PartsGroupKey => 
-            //TODO remove
-            $"{phoneNumber}@{id:0000}{totalParts:0000}";
+            $"{PhoneNumber}@{Id:0000}{TotalParts:0000}";
 
         public string PartInMessageKey => 
-            $"{number:0000}{date:yyyyMMddHHmmss}{cells}";
+            $"{Number:0000}{Date:yyyyMMddHHmmss}{Cells}";
 
-        public override string DebugInfo() {
-            return base.DebugInfo() + $" {PartInfo}\r\nText : {text}";
+        protected override string DebugInfo() {
+            return base.DebugInfo() + $" {PartInfo}\r\nText : {Text}";
         }
     }
 }
