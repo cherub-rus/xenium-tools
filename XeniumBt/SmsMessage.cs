@@ -36,12 +36,6 @@ namespace XeniumBt {
         public override string MessageKey => 
             $"{PhoneNumber}@{Date:yyyyMMddHHmmss}{Cells}";
 
-        protected string ToMobilePhoneToolsSms() {
-            return "Отправитель : " + PhoneNumber + "\r\n" +
-                   "Время : " + Date.ToString("yyyy-MM-dd HH:mm:ss") + "\r\n" +
-                   "Содержание : " + Text;
-        }
-
         public string ToMtkPhoneSuiteSms() {
             string dateString = Date != DateTime.MinValue ? Date.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture) : "";
             return $"\"{PhoneNumber}\"\t\"{dateString}\"\t\"{Text}\"";

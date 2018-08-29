@@ -50,7 +50,6 @@ namespace XeniumBt {
             foreach (SmsMessage data in combined) {
                 smsDebug.AppendLine(data.ToString()).AppendLine();
                 if (config.PhoneFilter == null || config.PhoneFilter == data.PhoneNumber) {
-//                    smsOut.AppendLine(data.ToMobilePhoneToolsSms()).AppendLine();
                     smsOut.AppendLine(data.ToMtkPhoneSuiteSms());
                 }
             }
