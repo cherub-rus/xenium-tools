@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+using XeniumBt.Objects;
+
 namespace XeniumBt {
 
     internal class SmsProcessor {
@@ -123,7 +125,7 @@ namespace XeniumBt {
             foreach (string key in sl.Keys) {
                 List<SmsPart> list = sl[key];
                 SmsPart first = list.First();
-                int totalParts = first.TotalParts;
+                int totalParts = first.Info.TotalParts;
 
                 if (list.Count < 2) {
                     WriteLog("Invalid parts. key = " + key);
@@ -135,7 +137,7 @@ namespace XeniumBt {
                 IList<SmsMessage> combined = new List<SmsMessage>();
 
                 for (int i = 1; i <= totalParts; i++) {
-                    foreach (SmsPart part in ordered.Where(p => p.Number == i)) {
+                    foreach (SmsPart part in ordered.Where(p => p.Info.Number == i)) {
                         List<SmsMessage> notFilled = combined.Where(c => !c.HasPart(i)).ToList();
                         SmsMessage message = FindNearestMessage(notFilled, part);
                         if (message != null) {

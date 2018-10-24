@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace XeniumBt {
+namespace XeniumBt.Objects {
 
     [Serializable]
     public class CellData {

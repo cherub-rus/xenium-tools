@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using XeniumBt.Objects;
+
 namespace XeniumBt {
 
     internal class ContactsProcessor {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace XeniumBt {
+namespace XeniumBt.Objects {
 
     public class SmsMessage : SmsRawData {
 
@@ -23,7 +23,7 @@ namespace XeniumBt {
         }
 
         public void AddPart(SmsPart part) {
-            hasParts.Add(part.Number);
+            hasParts.Add(part.Info.Number);
             Cells += part.Cells;
             Text += part.Text;
             debug += " " + part.PartInfo;

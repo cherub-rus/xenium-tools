@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+
+using XeniumBt.Objects;
 
 namespace XeniumBt {
 
@@ -87,16 +90,62 @@ namespace XeniumBt {
             if (data is SmsMessage) {
                 data.Text = Ucs2Tools.HexStringToUnicodeString(userData);
             } else if (data is SmsPart part) {
-                int headerLength = (Ucs2Tools.HexStringToHexBytes(userData.Substring(0, 2))[0] + 1)*2;
-                part.UserDataHeader = userData.Substring(0, headerLength);
-                // TODO header processing
-                byte[] header = Ucs2Tools.HexStringToHexBytes(part.UserDataHeader);
-                part.Id = header[3];
-                part.TotalParts = header[4];
-                part.Number = header[5];
-                part.Text = Ucs2Tools.HexStringToUnicodeString(userData.Substring(headerLength));
+                ProcessUserData(part, userData);
             }
             return data;
+        }
+
+        private static void ProcessUserData(SmsPart part, string userData) {
+            part.HeaderLength = (Ucs2Tools.HexStringToHexBytes(userData.Substring(0, 2))[0] + 1) * 2;
+            part.UserDataHeader = userData.Substring(0, part.HeaderLength);
+            part.Text = Ucs2Tools.HexStringToUnicodeString(userData.Substring(part.HeaderLength));
+
+            part.Info = GetPartInfo(ProcessDataHeader(part.UserDataHeader));
+        }
+
+        private static IDictionary<int, HeaderEntry> ProcessDataHeader(string userDataHeader) {
+            IDictionary<int, HeaderEntry> entries = new Dictionary<int, HeaderEntry>();
+
+            byte[] header = Ucs2Tools.HexStringToHexBytes(userDataHeader);
+
+            for(int i = 1; i < header.Length; i++) {
+                HeaderEntry entry = new HeaderEntry {
+                    Type = header[i],
+                    Size = header[i + 1]
+                };
+                entry.Data = header.Skip(i + 2).Take(entry.Size).ToArray();
+                i = i + 2 + entry.Size;
+                entries.Add(entry.Type, entry);
+            }
+            return entries;
+        }
+
+        private static PartInfo GetPartInfo(IDictionary<int, HeaderEntry> entries) {
+            // ReSharper disable once InconsistentNaming
+            const int CONCATENATED_8_BIT = 0;
+
+            if (entries.ContainsKey(CONCATENATED_8_BIT)) {
+                byte[] data = entries[CONCATENATED_8_BIT].Data;
+                return new PartInfo {
+                    Id = data[0],
+                    TotalParts = data[1],
+                    Number = data[2]
+                };
+            }
+
+            // ReSharper disable once InconsistentNaming
+            const int CONCATENATED_16_BIT = 8;
+
+            if (entries.ContainsKey(CONCATENATED_16_BIT)) {
+                byte[] data = entries[CONCATENATED_16_BIT].Data;
+                return new PartInfo {
+                    Id = (data[0]<<8) + data[1],
+                    TotalParts = data[2],
+                    Number = data[3]
+                };
+            }
+
+            return null;
         }
 
         private static string FixTimeZoneOffset(string dateString) {
